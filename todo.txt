@@ -1,0 +1,3 @@
+Set up bigquery credentials
+generate toy dataset
+implement minimum viable clustering algorithm
