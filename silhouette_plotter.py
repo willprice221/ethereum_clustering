@@ -107,7 +107,7 @@ def silhouette_plotter(X, range_n_clusters ):
 
         # 2nd Plot showing the actual clusters formed
         colors = cm.nipy_spectral(cluster_labels.astype(float) / n_clusters)
-        ax2.scatter(X[:, 0], X[:, 1], marker='.', s=30, lw=0, alpha=0.7,
+        ax2.scatter(X[:, 0], X[:, 1], marker='.', s=30, lw=0, alpha=0.5,
                     c=colors, edgecolor='k')
 
         # Labeling the clusters
@@ -118,12 +118,17 @@ def silhouette_plotter(X, range_n_clusters ):
 
         for i, c in enumerate(centers):
             ax2.scatter(c[0], c[1], marker='$%d$' % i, alpha=1,
-                        s=50, edgecolor='k')
+                        s=30, edgecolor='k')
+            print('cluster {} labelled'.format(i))
 
         ax2.set_title("The visualization of the clustered data.")
         ax2.set_xlabel("Feature space for the 1st feature")
         ax2.set_ylabel("Feature space for the 2nd feature")
 
+        ax2.set_yscale('log')
+        ax2.set_xscale('log')
+        ax2.set_xlim(.0001,1000)
+        ax2.set_ylim(.0001,1000)
         plt.suptitle(("Silhouette analysis for KMeans clustering on sample data "
                       "with n_clusters = %d" % n_clusters),
                      fontsize=14, fontweight='bold')
