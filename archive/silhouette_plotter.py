@@ -11,6 +11,7 @@ from sklearn.cluster import KMeans
 import matplotlib.cm as cm
 
 def sil_scores(X, range_n_clusters ):
+    result = []
     for n_clusters in range_n_clusters:
     #     X=data
         # Create a subplot with 1 row and 2 columns
@@ -27,7 +28,7 @@ def sil_scores(X, range_n_clusters ):
 
         # Initialize the clusterer with n_clusters value and a random generator
         # seed of 10 for reproducibility.
-        clusterer = KMeans(n_clusters=n_clusters, random_state=10)
+        clusterer = KMeans(n_clusters=n_clusters, n_init=20, max_iter=500)
         cluster_labels = clusterer.fit_predict(X)
 
 
@@ -38,8 +39,11 @@ def sil_scores(X, range_n_clusters ):
         silhouette_avg = silhouette_score(X, cluster_labels)
         print("For n_clusters =", n_clusters,
               "The average silhouette_score is :", silhouette_avg)
+        result.append(silhouette_avg)
+    return result
 
 def silhouette_plotter(X, range_n_clusters ):
+    all_scores = []
     for n_clusters in range_n_clusters:
     #     X=data
         # Create a subplot with 1 row and 2 columns
@@ -65,6 +69,7 @@ def silhouette_plotter(X, range_n_clusters ):
         # This gives a perspective into the density and separation of the formed
         # clusters
         silhouette_avg = silhouette_score(X, cluster_labels)
+        all_scores.append(silhouette_avg)
         print("For n_clusters =", n_clusters,
               "The average silhouette_score is :", silhouette_avg)
 
@@ -119,18 +124,19 @@ def silhouette_plotter(X, range_n_clusters ):
         for i, c in enumerate(centers):
             ax2.scatter(c[0], c[1], marker='$%d$' % i, alpha=1,
                         s=30, edgecolor='k')
-            print('cluster {} labelled'.format(i))
+            
 
         ax2.set_title("The visualization of the clustered data.")
         ax2.set_xlabel("Feature space for the 1st feature")
         ax2.set_ylabel("Feature space for the 2nd feature")
 
-        ax2.set_yscale('log')
-        ax2.set_xscale('log')
-        ax2.set_xlim(.0001,1000)
-        ax2.set_ylim(.0001,1000)
+        #ax2.set_yscale('log')
+        #ax2.set_xscale('log')
+        #ax2.set_xlim(.0001,1000)
+        #ax2.set_ylim(.0001,1000)
         plt.suptitle(("Silhouette analysis for KMeans clustering on sample data "
                       "with n_clusters = %d" % n_clusters),
                      fontsize=14, fontweight='bold')
 
     plt.show()
+    return all_scores
