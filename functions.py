@@ -65,8 +65,13 @@ def cluster(results, n_clusters):
 
 def assign_cluster_to_data(df, dflabel, cl):
     lbls = []
+    addrs = list(df['address'].values)
     for i, row in dflabel.iterrows():
-        lbls.append(list(df['address'].values).index(row['address']))
+        addr = row['address']
+        if row['address'] in addrs:
+            lbls.append(addrs.index(row['address']))
+        else:
+            lbls.append(False)
 
     dflabel['cluster'] = [cl.labels_[i] for i in lbls]
     return None
@@ -111,17 +116,28 @@ def plot_tsne(cl, tsne_results ):
     plt.xlabel('first principal component')
     plt.ylabel('second principal component')
     plt.show()
+    
+    
 def find_category_of_cluster(cl,dflabel, category="Exchange"):
     #assign cluster number with the most exchanges
-    exchange_cluster = 0
-    num_exchanges = 0
+    type_cluster = 0
+    num_of_type = 0
+    lbl_density=0
+    print(category)
     for clust in range(cl.n_clusters):
-        d = dflabel[dflabel['cluster']==clust]
+        size_of_cluster = np.sum(cl.labels_==clust)
+        
+        
+        mask = dflabel['cluster']==clust
+        d = dflabel[mask]
         num = np.sum(d['category']==category)
-        if num_exchanges < num:
-            num_exchanges = num
-            exchange_cluster = clust
-    return exchange_cluster
+        density = num / size_of_cluster
+        if density > lbl_density:
+            lbl_density=density
+            num_of_type = num
+            type_cluster = clust
+        print('cluster number   {}   number of type found: {}    cluster size: {}   label density: {}'.format(clust,num,size_of_cluster,density))
+    return type_cluster
 
 def plot_tsne_with_labels(tsne_results,df, dflabel,categs,colors):
     #need to mask df based on which results were kept from the reclustering
@@ -158,10 +174,10 @@ def plot_tsne_with_labels(tsne_results,df, dflabel,categs,colors):
 
         #category mask
         catmask = cats == c
-        if np.sum(mask) >10:
-            if c in categs:
-                idx=categs.index(c)
-                color = colors[idx]
+
+        if c in categs:
+            idx=categs.index(c)
+            color = colors[idx]
 
             plt.scatter(tsne_results[(labelmask & catmask)][:,0], tsne_results[(labelmask & catmask)][:,1], s=100,c=color, alpha=1,label=lbl)
 

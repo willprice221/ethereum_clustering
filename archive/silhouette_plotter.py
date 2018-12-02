@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn import cluster
 from sklearn.metrics import silhouette_score, silhouette_samples
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
