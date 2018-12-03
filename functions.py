@@ -46,7 +46,7 @@ def data_pipeline(df):
     data = df.iloc[:,1:]
     log = FunctionTransformer(func=np.log1p, inverse_func=np.expm1, validate=True)
     scale = StandardScaler()
-    pca =PCA(n_components=15)
+    pca =PCA(n_components=data.shape[1])
     
 
     #build pipeline
@@ -124,7 +124,7 @@ def find_category_of_cluster(cl,dflabel, category="Exchange"):
     num_of_type = 0
     lbl_density=0
     print(category)
-    for clust in range(cl.n_clusters):
+    for clust in np.unique(cl.labels_):
         size_of_cluster = np.sum(cl.labels_==clust)
         
         
@@ -132,7 +132,7 @@ def find_category_of_cluster(cl,dflabel, category="Exchange"):
         d = dflabel[mask]
         num = np.sum(d['category']==category)
         density = num / size_of_cluster
-        if density > lbl_density:
+        if num > num_of_type:
             lbl_density=density
             num_of_type = num
             type_cluster = clust
@@ -235,27 +235,5 @@ def plot_all(tsne_results,cl,df,dflabel,clusters,categs,colors ):
     plot_tsne_with_labels(tsne_results,df, dflabel,categs,colors)
     
 
-    
-    ##supervised!
-def plot_predictions(tsne_results, predictions):):
-    fig = plt.figure(figsize=(15,12))
-    ax = fig.add_subplot(111)
 
-    mask = predictions==1
-    
-    plt.scatter(tsne_results[mask][:,0], tsne_results[mask][:,1], s=100,c='green',alpha=.4,label=('Predicted exchanges'))
-
-    plt.scatter(tsne_results[~mask][:,0], tsne_results[~mask][:,1], c='gray',s=20, alpha=.1)
-
-    leg = plt.legend(bbox_to_anchor=(1, 1))
-    for lh in leg.legendHandles: 
-        lh.set_alpha(1)
-
-
-
-
-    plt.title('T-SNE', fontsize=20)
-    plt.xlabel('first principal component')
-    plt.ylabel('second principal component')
-    plt.show()
     
