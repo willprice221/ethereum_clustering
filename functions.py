@@ -55,7 +55,7 @@ def data_pipeline(df):
                      ('PCA', pca)])
 
     results = pipe.fit_transform(data)
-    return results
+    return pipe, results
 
 def cluster(results, n_clusters):
     cl = KMeans(n_clusters, n_init=20, max_iter=500,n_jobs=-1, verbose=0)
@@ -80,10 +80,11 @@ def calc_tsne(results, n_components=2, perplexity=40, n_iter=300,verbose=1):
     '''
     Calculated tsne for dataset'''
     time_start = time.time()
-    tsne = TSNE(n_components=n_components, perplexity=perplexity, n_iter=n_iter,verbose=verbose)
+    tsne = TSNE(n_components=n_components, perplexity=perplexity, n_iter=n_iter,verbose=verbose,learning_rate=100)
     tsne_results = tsne.fit_transform(results)
     print('t-SNE done! Time elapsed: {} seconds'.format(time.time()-time_start))
     return tsne_results
+
 
 def plot_tsne(cl, tsne_results ):
     '''
@@ -225,9 +226,9 @@ def recluster(df, cl, clusters, n_clusters):
     mask = np.array([False for i in range(len(lbls))])
     for c in clusters:
         mask |= lbls==c
-    results = data_pipeline(df[mask])
+    subpipe, results = data_pipeline(df[mask])
     subcl = cluster(results, n_clusters)
-    return subcl, results, df[mask]
+    return subpipe, subcl, results, df[mask]
 
 def plot_all(tsne_results,cl,df,dflabel,clusters,categs,colors ):
     plot_tsne(cl, tsne_results)

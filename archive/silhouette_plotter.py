@@ -41,7 +41,7 @@ def sil_scores(X, range_n_clusters ):
         result.append(silhouette_avg)
     return result
 
-def silhouette_plotter(X, range_n_clusters ):
+def silhouette_plotter(X, range_n_clusters, tsne_X ):
     all_scores = []
     for n_clusters in range_n_clusters:
     #     X=data
@@ -111,18 +111,9 @@ def silhouette_plotter(X, range_n_clusters ):
 
         # 2nd Plot showing the actual clusters formed
         colors = cm.nipy_spectral(cluster_labels.astype(float) / n_clusters)
-        ax2.scatter(X[:, 0], X[:, 1], marker='.', s=30, lw=0, alpha=0.5,
+        ax2.scatter(tsne_X[:, 0], tsne_X[:, 1], marker='.', s=30, lw=0, alpha=0.5,
                     c=colors, edgecolor='k')
 
-        # Labeling the clusters
-        centers = clusterer.cluster_centers_
-        # Draw white circles at cluster centers
-        ax2.scatter(centers[:, 0], centers[:, 1], marker='o',
-                    c="white", alpha=1, s=200, edgecolor='k')
-
-        for i, c in enumerate(centers):
-            ax2.scatter(c[0], c[1], marker='$%d$' % i, alpha=1,
-                        s=30, edgecolor='k')
             
 
         ax2.set_title("The visualization of the clustered data.")
