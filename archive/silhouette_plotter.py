@@ -88,7 +88,7 @@ def silhouette_plotter(X, range_n_clusters, tsne_X ):
             size_cluster_i = ith_cluster_silhouette_values.shape[0]
             y_upper = y_lower + size_cluster_i
 
-            color = cm.nipy_spectral(float(i) / n_clusters)
+            color = cm.nipy_spectral(float(i) / 8)
             ax1.fill_betweenx(np.arange(y_lower, y_upper),
                               0, ith_cluster_silhouette_values,
                               facecolor=color, edgecolor=color, alpha=0.7)
@@ -110,8 +110,8 @@ def silhouette_plotter(X, range_n_clusters, tsne_X ):
         ax1.set_xticks([-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1])
 
         # 2nd Plot showing the actual clusters formed
-        colors = cm.nipy_spectral(cluster_labels.astype(float) / n_clusters)
-        ax2.scatter(tsne_X[:, 0], tsne_X[:, 1], marker='.', s=30, lw=0, alpha=0.5,
+        colors = cm.nipy_spectral(cluster_labels.astype(float) / 8)
+        ax2.scatter(tsne_X[:, 0], tsne_X[:, 1], marker='.', s=30, lw=0, alpha=1,
                     c=colors, edgecolor='k')
 
             
