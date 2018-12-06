@@ -1,3 +1,5 @@
+import nltk
+from nltk.cluster.kmeans import KMeansClusterer 
 
 from google.cloud import bigquery
 client = bigquery.Client()
@@ -76,7 +78,7 @@ def assign_cluster_to_data(df, dflabel, cl):
     dflabel['cluster'] = [cl.labels_[i] for i in lbls]
     return None
 
-def calc_tsne(results, n_components=2, perplexity=40, n_iter=300,verbose=1):
+def calc_tsne(results, n_components=2, perplexity=20, n_iter=300,verbose=1):
     '''
     Calculated tsne for dataset'''
     time_start = time.time()
@@ -156,7 +158,7 @@ def plot_tsne_with_labels(tsne_results,df, dflabel,categs,colors):
     subset, not_subset  = tsne_results[labelmask] , tsne_results[~labelmask]
     fig = plt.figure(figsize=(15,12))
     #not labelled points
-    plt.scatter(not_subset[:,0], not_subset[:,1], s=20, c='gray', alpha=.05)
+    plt.scatter(not_subset[:,0], not_subset[:,1], s=20, c='gray', alpha=.3)
 
     #categories
     cats = np.array([cat(addr, labeled_addresses, dflabel) for addr in df['address']])#[address_mask] ]) #added address mask for all clusters
@@ -207,7 +209,7 @@ def plot_tsne_with_labeled_clusters(tsne_results, cl, clusters, categs, colors):
 
             plt.scatter(tsne_results[mask][:,0], tsne_results[mask][:,1], s=100,c=color,alpha=.4,label=('Cluster {} - "{}" '.format(c,lbl) ))
         else:
-             plt.scatter(tsne_results[mask][:,0], tsne_results[mask][:,1], c='gray',s=20, alpha=.1)
+             plt.scatter(tsne_results[mask][:,0], tsne_results[mask][:,1], c='gray',s=20, alpha=.3)
 
     leg = plt.legend(bbox_to_anchor=(1, 1))
     for lh in leg.legendHandles: 
@@ -227,7 +229,16 @@ def recluster(df, cl, clusters, n_clusters):
     for c in clusters:
         mask |= lbls==c
     subpipe, results = data_pipeline(df[mask])
+    
+    ##use cosine similarity! NLTK clustering implementation
+    #KMeans cluster object as carrier for consistency
     subcl = cluster(results, n_clusters)
+    kclusterer = KMeansClusterer(n_clusters, distance=nltk.cluster.util.cosine_distance, repeats=50)
+    assigned_clusters = kclusterer.cluster(results, assign_clusters=True)
+    #assign new cluster labels and cluster centroids
+    subcl.labels_ = np.array(assigned_clusters)
+    subcl.cluster_centers_ = np.array(kclusterer.means())
+    
     return subpipe, subcl, results, df[mask]
 
 def plot_all(tsne_results,cl,df,dflabel,clusters,categs,colors ):
